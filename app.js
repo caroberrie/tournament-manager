@@ -13,10 +13,30 @@ app.use(session({
     saveUninitialized: true
 }));
 
+
+//gets
 app.get('/', function(request, response) {
     response.render('login.ejs');
 });
 
+app.get('/home', function(request, response) {
+    response.render('home.ejs');
+});
+
+
+//register no
+app.get('/register', function(request, response) {
+    response.render('registration.ejs');
+});
+
+//posts
+app.post('/auth', function(request, response) {
+    response.redirect('/home');
+});
+
+app.post('/register', function(request, response) {
+    response.redirect('/register');
+});
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
