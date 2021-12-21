@@ -28,16 +28,20 @@ class Database {
 
             let collection = db.collection('users');
 
+
+            const pw = await new pwManage();
+
+            var passHex = await pw.passSet(password);
+
             let query = {
                 username: username,
-                password: password,
+                password: passHex,
                 association: association,
 
             }
 
             let res = await collection.insertOne(query);
 
-            console.log("user added")
 
         } catch (err) {
 
@@ -72,6 +76,7 @@ class Database {
 
             console.log("user checked")
 
+            client.close();
             return res;
 
         } catch (err) {
@@ -81,6 +86,38 @@ class Database {
 
             client.close();
 
+        }
+    }
+
+    async login(user, password) {
+        const client = await MongoClient.connect(config.DB_URI, { useNewUrlParser: true })
+            .catch(err => { console.log(err); });
+
+        var passBool
+
+        if (!client) {
+            return;
+        }
+
+        try {
+
+            const pw = await new pwManage();
+
+            const db = client.db("Capstone");
+
+            let collection = db.collection('users');
+
+            let query = { username: user }
+
+            let res = await collection.findOne(query);
+
+            passBool = await pw.validPassword(password, res.password)
+
+        } catch (err) {
+            passBool = false;
+        } finally {
+            client.close();
+            return passBool;
         }
     }
 }

@@ -4,6 +4,7 @@ var bodyParser = require('body-parser');
 var path = require('path');
 const fs = require('fs');
 const Database = require('./src/database.js');
+const e = require('express');
 
 const router = express.Router();
 
@@ -22,7 +23,9 @@ app.use(bodyParser.json());
 ////////////////////////////////
 
 app.get('/', function(request, response) {
-    response.render('login.ejs');
+    response.render('login.ejs', {
+        error: null
+    });
 });
 
 
@@ -42,7 +45,19 @@ app.get('/register', function(request, response) {
 ////////////////////////////////
 
 app.post('/auth', function(request, response) {
-    response.redirect('/home');
+    //need login code
+    //async login code please
+    var user = request.body.username;
+    var pass = request.body.password;
+    async function login() {
+        const db = await new Database();
+        if (await db.login(user.toString().toLowerCase(), pass)) { response.redirect('/home'); } else {
+            response.render('login.ejs', {
+                error: "Password or username is incorrect"
+            });
+        }
+    }
+    login();
 });
 
 app.post('/register', function(request, response) {
@@ -50,23 +65,27 @@ app.post('/register', function(request, response) {
 });
 
 app.post('/login', function(request, response) {
-    response.render('login.ejs');
+
+
+    response.render('login.ejs', {
+        error: null
+    });
 });
 
 
 //code for registration
 app.post('/registerUser', function(request, response) {
     try {
-        user = request.body.usernameRegistration;
-        passOne = request.body.passwordFirst;
-        passTwo = request.body.passwordSecond;
+        var user = request.body.usernameRegistration;
+        var passOne = request.body.passwordFirst;
+        var passTwo = request.body.passwordSecond;
         console.log(user, passOne, passTwo);
 
         async function registration() {
             const db = await new Database();
 
-            console.log(await db.checkUser(user))
-                //if duplicate username
+
+            //if duplicate username
             if (await db.checkUser(user)) {
                 response.render('registration.ejs', {
                     error: "Username Exists"
@@ -78,9 +97,11 @@ app.post('/registerUser', function(request, response) {
                 });
             } else {
                 //send user to login page upon succesful registration
-                await db.addUser(user, passOne, null);
-                console.log("register");
-                response.render('login.ejs');
+                await db.addUser(user.toString().toLowerCase(), passOne, null);
+
+                response.render('login.ejs', {
+                    error: "Password or username is incorrect"
+                });
             }
         }
         //database calls need to be done async
