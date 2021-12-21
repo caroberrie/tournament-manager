@@ -50,5 +50,38 @@ class Database {
 
 
     }
+    async checkUser(username) {
+        const client = await MongoClient.connect(config.DB_URI, { useNewUrlParser: true })
+            .catch(err => { console.log(err); });
+
+        if (!client) {
+            return;
+        }
+
+        try {
+
+            const db = client.db("Capstone");
+
+            let collection = db.collection('users');
+
+            let query = {
+                username: username,
+            }
+
+            let res = await collection.countDocuments(query);
+
+            console.log("user checked")
+
+            return res;
+
+        } catch (err) {
+
+            console.log(err);
+        } finally {
+
+            client.close();
+
+        }
+    }
 }
 module.exports = Database;
