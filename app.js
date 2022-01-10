@@ -33,6 +33,12 @@ app.get('/home', function(request, response) {
     response.render('home.ejs');
 });
 
+app.get('/account', function(request,response){
+    response.render('account.ejs');
+});
+
+
+
 //register no
 app.get('/register', function(request, response) {
     response.render('registration.ejs', {

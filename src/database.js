@@ -120,5 +120,40 @@ class Database {
             return passBool;
         }
     }
+
+    async tournamentadd(name, type, format, style, location, owner, start, end) {
+        const client = await MongoClient.connect(config.DB_URI, { useNewUrlParser: true })
+            .catch(err => { console.log(err); });
+
+        var passBool
+
+        if (!client) {
+            return;
+        }
+
+        try {
+
+            const db = client.db("Capstone");
+
+            let collection = db.collection('tournaments');
+
+            let query = { 
+                name: name,
+                type: type,
+            format: format,
+            style: style,
+            location: location,
+            owner: owner,
+            start: start,
+            end: end }
+
+            let res = await collection.insertOne(query);
+
+     
+        } finally {
+            client.close();
+          
+        }
+    }
 }
 module.exports = Database;
