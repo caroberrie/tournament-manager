@@ -19,7 +19,7 @@ class pwManage {
     };
 
 
-
+    //password validation.
     async validPassword(password, hash) {
         return new Promise((resolve, reject) => {
             const [salt, key] = hash.split(":")

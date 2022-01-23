@@ -5,6 +5,8 @@ var path = require('path');
 const fs = require('fs');
 const Database = require('./src/database.js');
 const e = require('express');
+const { request } = require('http');
+const { response } = require('express');
 
 const router = express.Router();
 
@@ -46,6 +48,15 @@ app.get('/register', function(request, response) {
     });
 });
 
+
+app.get('/tournamentregister', function(request, response) {
+    response.render('tournamentregister.ejs', {
+        error: null
+    });
+});
+
+
+
 ////////////////////////////////
 //posts
 ////////////////////////////////
@@ -55,6 +66,8 @@ app.post('/auth', function(request, response) {
     //async login code please
     var user = request.body.username;
     var pass = request.body.password;
+
+    request.session.username = user;
     async function login() {
         const db = await new Database();
         if (await db.login(user.toString().toLowerCase(), pass)) { response.redirect('/home'); } else {
@@ -119,6 +132,41 @@ app.post('/registerUser', function(request, response) {
 
     } finally {
         //response.end();
+    }
+});
+
+//post for tournament registration
+app.post('/registerTournament', function(request, response) {
+    try {
+
+        //need verificaiton to see if tournment exists before we go to to register a new one
+        //
+        async function registration() {
+            //all from user input post request
+            var tName = request.body.tournamentName;
+            var type = request.body.type;
+            var format= request.body.format;
+            var style = request.body.style;
+            var location = request.body.location;
+            var end = request.body.end;
+            var start = request.body.start;
+
+            //need to grab username in a different wat
+            var username = request.session.username;
+
+            const db = await new Database();
+            db.tournamentadd(tName, type,format, style,location, username, start,end);
+        }
+        //database calls need to be done async
+        registration();
+    } catch (e) {
+        response.status(404).render('/errorpage.ejs')
+
+        console.log("something went wrong")
+
+    } finally {
+        //response.end();
+        response.render('home.ejs')
     }
 });
 

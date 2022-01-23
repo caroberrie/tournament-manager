@@ -26,7 +26,7 @@
     <div class="container-fluid">
         <div class="row justify-content-center align-items-center window-height">
             <div class="col-md-3">
-                <form action="register" method="POST">
+                <form action="registerTournament" method="POST">
                     <div class="card shadow">
 
                         <div class="card-body">
@@ -36,37 +36,34 @@
 
                             <div class="mt-4">
                                 <div class="form-group">
-                                    <label for="exampleInputFirstNameJane" class="form-label">First Name </label>
-                                    <input type="text" name="firstName" placeholder="First Name" required>
-                                    <div id="firstNameHelp" class="form-text"></div>
+                                    <label for="exampleInputFirstNameJane" class="form-label">Tournament Name </label>
+                                    <input type="text" name="tournamentName" placeholder="Tournament Name" required>
+                                    <div id="tournamentNameHelp" class="form-text"></div>
                                 </div>
                                 <div class="form-group">
-                                    <label for="exampleInputLastNameDoe" class="form-label">Last Name </label>
-                                    <input type="text" name="lastName" placeholder="Last Name" required>
-                                    <div id="lastNameHelp" class="form-text"></div>
+                                    <label for="exampleInputLastNameDoe" class="form-label">Type </label>
+                                    <input type="text" name="type" placeholder="Type" required>
+                                    <div id="typeHelp" class="form-text"></div>
                                 </div>
                                 <div class="form-group">
-                                    <label for="exampleInputAge" class="form-label">Student Age </label>
-                                    <input type="text" name="age" placeholder="Students Age" required>
+                                    <label for="exampleInputFormat" class="form-label">Format </label>
+                                    <input type="text" name="format" placeholder="Format" required>
                                 </div>
                                 <div class="form-group">
-                                    <label for="exampleInputPhoneNumber1" class="form-label">Address </label>
-                                    <input type="text" name="address" placeholder="Address" required>
+                                    <label for="exampleInputStyle" class="form-label">Style </label>
+                                    <input type="text" name="style" placeholder="Style" required>
                                 </div>
                                 <div class="form-group">
-                                    <label for="exampleInputPhoneNumber1" class="form-label">Phone Number </label>
-                                    <input type="phone_number" name="phoneNumber" placeholder="Phone Number" required>
+                                    <label for="exampleInputLocation" class="form-label">Location </label>
+                                    <input type="location" name="location" placeholder="Location" required>
                                 </div>
-
-
-
-
-                                <div>
-                                    <%= name %>
+                                <div class="form-group">
+                                    <label for="exampleInputStart" class="form-label">Start </label>
+                                    <input type="start" name="start" placeholder="start" required>
                                 </div>
-                                <div>
-
-                                    <img src="qr-code.png" alt="QR-Code Goes Here">
+                                <div class="form-group">
+                                    <label for="exampleInputEnd" class="form-label">End </label>
+                                    <input type="endTime" name="end" placeholder="End" required>
                                 </div>
                             </div>
 

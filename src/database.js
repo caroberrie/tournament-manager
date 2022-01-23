@@ -14,7 +14,7 @@ const fs = require('fs');
 class Database {
     constructor() {}
 
-    async addUser(username, password, association) {
+    async addUser(username, password) {
         const client = await MongoClient.connect(config.DB_URI, { useNewUrlParser: true })
             .catch(err => { console.log(err); });
 
@@ -36,7 +36,7 @@ class Database {
             let query = {
                 username: username,
                 password: passHex,
-                association: association,
+                registeredToo: null,
 
             }
 
@@ -54,6 +54,8 @@ class Database {
 
 
     }
+
+    //checks to see if user exists for login registering a user
     async checkUser(username) {
         const client = await MongoClient.connect(config.DB_URI, { useNewUrlParser: true })
             .catch(err => { console.log(err); });
@@ -89,6 +91,7 @@ class Database {
         }
     }
 
+    //login code need to go passwordmanage to test and salt password
     async login(user, password) {
         const client = await MongoClient.connect(config.DB_URI, { useNewUrlParser: true })
             .catch(err => { console.log(err); });
@@ -125,7 +128,7 @@ class Database {
         const client = await MongoClient.connect(config.DB_URI, { useNewUrlParser: true })
             .catch(err => { console.log(err); });
 
-        var passBool
+
 
         if (!client) {
             return;
@@ -136,6 +139,9 @@ class Database {
             const db = client.db("Capstone");
 
             let collection = db.collection('tournaments');
+            
+            db.createCollection(name);
+
 
             let query = { 
                 name: name,
@@ -155,5 +161,49 @@ class Database {
           
         }
     }
-}
+
+  
+    
+    async addusertotournament(username, tournament){
+        const client = await MongoClient.connect(config.DB_URI, { useNewUrlParser: true })
+            .catch(err => { console.log(err); });
+
+
+
+        if (!client) {
+            return;
+        }
+
+        try {
+
+            const db = client.db("Capstone");
+
+            let collection = db.collection(tournament);
+
+            //lets set defualt values to what we will need 
+            // need an array of users they wll play
+            //win / loss / draw 
+            //who they play next 
+            //list of who to play
+            let query = {
+                username: username,
+                wins: null,
+                loss: null,
+                draw: null,
+                playnext: null,
+                listtoplay: null,
+            }
+
+            let res = await collection.insertOne(username);
+
+            
+
+     
+        } finally {
+            client.close();
+          
+        }
+    }
+    }
+
 module.exports = Database;
