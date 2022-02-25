@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>All Tournaments</title>
+
+    <!-- CSS (load bootstrap from a CDN) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body {
+            padding-top: 50px;
+        }
+        
+        table {
+            border-collapse: separate;
+            border-spacing: 0 15px;
+        }
+        
+        th {
+            background-color: #4287f5;
+            color: white;
+        }
+        
+        th,
+        td {
+            width: 150px;
+            text-align: center;
+            border: 1px solid black;
+            padding: 5px;
+        }
+        
+        h2 {
+            color: #4287f5;
+        }
+    </style>
+</head>
+
+<body class="container">
+
+    <header>
+        <%- include('./partials/header.ejs'); %>
+    </header>
+    <span style="color: #ff0000"><%= error %></span>
+    <main>
+        <table>
+            <tr>
+                <th>Name</th>
+                <th>Type </th>
+                <th>Format</th>
+                <th>Style</th>
+                <th>Location</th>
+                <th>Start</th>
+                
+            </tr>
+            <tr>
+                <% for(var i=1; i<tournaments.length; i++){ %>
+                    <tr>
+                        <td>
+                            <%= tournaments[i].name %>
+                        </td>
+                        <td>
+                            <%= tournaments[i].type %>
+                        </td>
+                        <td>
+                            <%= tournaments[i].format %>
+                        </td>
+                        <td>
+                            <%= tournaments[i].style %>
+                        </td>
+                        <td>
+                            <%= tournaments[i].location %>
+                        </td>
+                        <td>
+                            <%= tournaments[i].start %>
+                        </td>
+                        <td>
+                            <a href="/allTournaments?id=<%= tournaments[i].name %>" id=<%= tournaments[i].name %>>Add</a>
+                           
+
+                            
+                        </td>
+                    </tr>
+                    <% } %>
+            </tr>
+        </table>
+    </main>
+
+    <footer>
+        <%- include('./partials/footer.ejs'); %>
+    </footer>
+    <script>
+
+    </script>
+</body>
+
+</html>

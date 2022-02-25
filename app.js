@@ -7,6 +7,7 @@ const Database = require('./src/database.js');
 const e = require('express');
 const { request } = require('http');
 const { response } = require('express');
+const { stringify } = require('querystring');
 
 const router = express.Router();
 
@@ -32,7 +33,8 @@ app.get('/', function(request, response) {
 
 
 app.get('/home', function(request, response) {
-    response.render('home.ejs');
+    response.render("home.ejs",{
+        status: "Welcome " + request.session.username});
 });
 
 app.get('/account', function(request,response){
@@ -56,10 +58,58 @@ app.get('/tournamentregister', function(request, response) {
 });
 
 
+app.get("/allTournaments", function(request, response) {
+    var id = request.query.id;
+    
+    console.log(id);
+    async function allT(){
+        const db = new Database();
+        var tournaments= await db.allTourn();
+        //for (tournaments.time > Date.now()){ 
+            //now do tournament.time to make new obj containing proper ones to display 
+        //};
+        //add time verfication from tournaments
+        if(id==null){
+        response.render("allTournaments.ejs", { 
+            error: null,
+            tournaments: tournaments });
+            response.end();
+        }
+        
+        if(id != null){
+            //need to check if user is already registered if so display an error at top of page and reload
+            if(await db.checkUserInTournament(request.session.username,id) == 0){
+                await db.addusertotournament(request.session.username,id);
+                response.render("home.ejs",{
+                    status: "Thank you for registering to " + id});
+                }
+            else
+                {   
+                    response.render("allTournaments.ejs", { 
+                        error: "You are already registered to that tournament!",
+                        tournaments: tournaments });
+                    
+                }
+            //response.render('home.ejs')
+            response.end();
+            return;
+        }
+    }
+    if (request.session.loggedin) {
+         allT();
+    } else
+        response.send('Please login to view this page!');
+    //start of code to show all avaliable tournaments
+    //we need database code to back this up 
+    //need ejs to display out to user.
+    
+
+});
 
 ////////////////////////////////
 //posts
 ////////////////////////////////
+
 
 app.post('/auth', function(request, response) {
     //need login code
@@ -68,6 +118,7 @@ app.post('/auth', function(request, response) {
     var pass = request.body.password;
 
     request.session.username = user;
+    request.session.loggedin = true;
     async function login() {
         const db = await new Database();
         if (await db.login(user.toString().toLowerCase(), pass)) { response.redirect('/home'); } else {
@@ -140,7 +191,8 @@ app.post('/registerTournament', function(request, response) {
     try {
 
         //need verificaiton to see if tournment exists before we go to to register a new one
-        //
+        //append creation time and date onto name
+        //need to check if user has active already
         async function registration() {
             //all from user input post request
             var tName = request.body.tournamentName;
@@ -166,7 +218,8 @@ app.post('/registerTournament', function(request, response) {
 
     } finally {
         //response.end();
-        response.render('home.ejs')
+        response.render("home.ejs",{
+            status: "Thank you for registering the tournament!"});
     }
 });
 

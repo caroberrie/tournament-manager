@@ -91,6 +91,40 @@ class Database {
         }
     }
 
+    async checkUserInTournament(username,tournament) {
+        const client = await MongoClient.connect(config.DB_URI, { useNewUrlParser: true })
+            .catch(err => { console.log(err); });
+
+        if (!client) {
+            return;
+        }
+
+        try {
+
+            const db = client.db("Capstone");
+
+            let collection = db.collection(tournament);
+
+            let query = {
+                username: username,
+            }
+
+            let res = await collection.countDocuments(query);
+
+            console.log("user checked")
+
+            client.close();
+            return res;
+
+        } catch (err) {
+
+            console.log(err);
+        } finally {
+
+            client.close();
+
+        }
+    }
     //login code need to go passwordmanage to test and salt password
     async login(user, password) {
         const client = await MongoClient.connect(config.DB_URI, { useNewUrlParser: true })
@@ -194,7 +228,7 @@ class Database {
                 listtoplay: null,
             }
 
-            let res = await collection.insertOne(username);
+            let res = await collection.insertOne(query);
 
             
 
@@ -204,6 +238,50 @@ class Database {
           
         }
     }
+    async allTourn(time) {
+        
+        const client = await MongoClient.connect(config.DB_URI, { useNewUrlParser: true })
+            .catch(err => { console.log(err); });
+
+        if (!client) {
+            return;
+        }
+
+        try {
+            const db = client.db("Capstone");
+
+
+
+            let collection = db.collection('tournaments');
+
+            var obj = [{}];
+
+            for await (const doc of collection.find()) {
+//do the time verificaiton in servrr file
+                obj.push({
+                    name: doc.name,
+                    type: doc.type,
+                    format: doc.format,
+                    style: doc.style,
+                    location: doc.location,
+                    owner: doc.owner,
+                    time: doc.start
+                });
+                //buildstring = "Name: " + doc.name + " Location: " + doc.location + "\n" + buildstring;
+                // Prints documents one at a time
+            }
+
+        } catch (err) {
+
+            console.log(err);
+        } finally {
+
+            client.close();
+            //console.log(buildstring); //test to see if string is made right
+            return obj;
+        }
+    }
+
     }
 
 module.exports = Database;
