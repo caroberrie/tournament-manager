@@ -57,13 +57,13 @@
                                 <div class="form-group">
                                     <label for="exampleInputFormat" class="form-label">Format </label>
                                     <label for="typeoftournmant" class="form-label">Type </label>
-                                    <select name = "type" required>
+                                    <select name = "format" required>
                                         <option value = "modern" selected>Modern</option>
                                          <option value = "commander">Commander</option>
                                          <option value = "standard">Standard</option>
                                         <option value = "historic">Historic</option>
-                                       
                                         <option value = "legacy">Legacy</option>
+                                        <option value = "legacy">Not Listed</option>
                                         </select>
                                     <div id="typeHelp" class="form-text"></div>
                                 </div>
@@ -76,12 +76,8 @@
                                     <input type="location" name="location" placeholder="Location" required>
                                 </div>
                                 <div class="form-group">
-                                    <label for="exampleInputStart" class="form-label">Start </label>
-                                    <input type="start" name="start" placeholder="start" required>
-                                </div>
-                                <div class="form-group">
-                                    <label for="exampleInputEnd" class="form-label">End </label>
-                                    <input type="endTime" name="end" placeholder="End" required>
+                                    <label for="exampleInputStart" class="form-label">Start Time </label>
+                                    <input type="time" id="start" name="start" required>
                                 </div>
                             </div>
 

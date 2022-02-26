@@ -196,7 +196,8 @@ class Database {
         }
     }
 
-  
+    
+    
     
     async addusertotournament(username, tournament){
         const client = await MongoClient.connect(config.DB_URI, { useNewUrlParser: true })

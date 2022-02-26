@@ -156,7 +156,8 @@ app.post('/registerUser', function(request, response) {
 
 
             //if duplicate username
-            if (await db.checkUser(user)) {
+            //need to make names lower becuase user names are not case sensitive in db
+            if (await db.checkUser(user.toLowerCase())) {
                 response.render('registration.ejs', {
                     error: "Username Exists"
                 });
@@ -170,7 +171,7 @@ app.post('/registerUser', function(request, response) {
                 await db.addUser(user.toString().toLowerCase(), passOne, null);
 
                 response.render('login.ejs', {
-                    error: "Password or username is incorrect"
+                    error: null
                 });
             }
         }
@@ -207,6 +208,7 @@ app.post('/registerTournament', function(request, response) {
             var username = request.session.username;
 
             const db = await new Database();
+            
             db.tournamentadd(tName, type,format, style,location, username, start,end);
         }
         //database calls need to be done async
