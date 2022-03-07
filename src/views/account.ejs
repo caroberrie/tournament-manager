@@ -76,19 +76,20 @@
     <body>
 
         <div class="sidebar">
-            <a class="active" href="#home">Account Info</a>
-            <a href="#news">News</a>
+            <a class="active" href="#home" id=<home> Account Info</a>
+            <a href="#news" id=<News>News</a>
             <a href="#contact">Contact</a>
-            <a href="#about">About</a>
+            <a href="#about" id=<About>>About</a>
         </div>
-        <main>
-
-        </main>
-
-        <footer>
-            <%- include('./partials/footer.ejs'); %>
-        </footer>
-
     </body>
+    <main class="text-center">
+        <%=displayinfo%>
+    </main>
+
+    <footer>
+        <%- include('./partials/footer.ejs'); %>
+    </footer>
+
+
 
 </html>

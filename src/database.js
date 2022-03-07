@@ -37,7 +37,8 @@ class Database {
                 username: username,
                 password: passHex,
                 registeredToo: null,
-
+                win: 0,
+                loss: 0
             }
 
             let res = await collection.insertOne(query);
@@ -91,41 +92,41 @@ class Database {
         }
     }
 
-    async checkUserInTournament(username,tournament) {
-        const client = await MongoClient.connect(config.DB_URI, { useNewUrlParser: true })
-            .catch(err => { console.log(err); });
+    async checkUserInTournament(username, tournament) {
+            const client = await MongoClient.connect(config.DB_URI, { useNewUrlParser: true })
+                .catch(err => { console.log(err); });
 
-        if (!client) {
-            return;
-        }
-
-        try {
-
-            const db = client.db("Capstone");
-
-            let collection = db.collection(tournament);
-
-            let query = {
-                username: username,
+            if (!client) {
+                return;
             }
 
-            let res = await collection.countDocuments(query);
+            try {
 
-            console.log("user checked")
+                const db = client.db("Capstone");
 
-            client.close();
-            return res;
+                let collection = db.collection(tournament);
 
-        } catch (err) {
+                let query = {
+                    username: username,
+                }
 
-            console.log(err);
-        } finally {
+                let res = await collection.countDocuments(query);
 
-            client.close();
+                console.log("user checked")
 
+                client.close();
+                return res;
+
+            } catch (err) {
+
+                console.log(err);
+            } finally {
+
+                client.close();
+
+            }
         }
-    }
-    //login code need to go passwordmanage to test and salt password
+        //login code need to go passwordmanage to test and salt password
     async login(user, password) {
         const client = await MongoClient.connect(config.DB_URI, { useNewUrlParser: true })
             .catch(err => { console.log(err); });
@@ -173,33 +174,34 @@ class Database {
             const db = client.db("Capstone");
 
             let collection = db.collection('tournaments');
-            
+
             db.createCollection(name);
 
 
-            let query = { 
+            let query = {
                 name: name,
                 type: type,
-            format: format,
-            style: style,
-            location: location,
-            owner: owner,
-            start: start,
-            end: end }
+                format: format,
+                style: style,
+                location: location,
+                owner: owner,
+                start: start,
+                end: end
+            }
 
             let res = await collection.insertOne(query);
 
-     
+
         } finally {
             client.close();
-          
+
         }
     }
 
-    
-    
-    
-    async addusertotournament(username, tournament){
+
+
+
+    async addusertotournament(username, tournament) {
         const client = await MongoClient.connect(config.DB_URI, { useNewUrlParser: true })
             .catch(err => { console.log(err); });
 
@@ -231,16 +233,16 @@ class Database {
 
             let res = await collection.insertOne(query);
 
-            
 
-     
+
+
         } finally {
             client.close();
-          
+
         }
     }
     async allTourn(time) {
-        
+
         const client = await MongoClient.connect(config.DB_URI, { useNewUrlParser: true })
             .catch(err => { console.log(err); });
 
@@ -258,7 +260,7 @@ class Database {
             var obj = [{}];
 
             for await (const doc of collection.find()) {
-//do the time verificaiton in servrr file
+                //do the time verificaiton in servrr file
                 obj.push({
                     name: doc.name,
                     type: doc.type,
@@ -283,6 +285,6 @@ class Database {
         }
     }
 
-    }
+}
 
 module.exports = Database;

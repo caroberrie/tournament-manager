@@ -33,12 +33,23 @@ app.get('/', function(request, response) {
 
 
 app.get('/home', function(request, response) {
-    response.render("home.ejs",{
-        status: "Welcome " + request.session.username});
+    response.render("home.ejs", {
+        status: "Welcome " + request.session.username
+    });
 });
 
-app.get('/account', function(request,response){
-    response.render('account.ejs');
+app.get('/account', function(request, response) {
+    response.render('account.ejs', {
+        displayinfo: null
+    });
+
+    var id = request.query.id;
+
+    if (id == "about") {
+        response.render('account.ejs', {
+            displayinfo: "Test"
+        })
+    }
 });
 
 
@@ -60,49 +71,50 @@ app.get('/tournamentregister', function(request, response) {
 
 app.get("/allTournaments", function(request, response) {
     var id = request.query.id;
-    
+
     console.log(id);
-    async function allT(){
+    async function allT() {
         const db = new Database();
-        var tournaments= await db.allTourn();
+        var tournaments = await db.allTourn();
         //for (tournaments.time > Date.now()){ 
-            //now do tournament.time to make new obj containing proper ones to display 
+        //now do tournament.time to make new obj containing proper ones to display 
         //};
         //add time verfication from tournaments
-        if(id==null){
-        response.render("allTournaments.ejs", { 
-            error: null,
-            tournaments: tournaments });
+        if (id == null) {
+            response.render("allTournaments.ejs", {
+                error: null,
+                tournaments: tournaments
+            });
             response.end();
         }
-        
-        if(id != null){
+
+        if (id != null) {
             //need to check if user is already registered if so display an error at top of page and reload
-            if(await db.checkUserInTournament(request.session.username,id) == 0){
-                await db.addusertotournament(request.session.username,id);
-                response.render("home.ejs",{
-                    status: "Thank you for registering to " + id});
-                }
-            else
-                {   
-                    response.render("allTournaments.ejs", { 
-                        error: "You are already registered to that tournament!",
-                        tournaments: tournaments });
-                    
-                }
+            if (await db.checkUserInTournament(request.session.username, id) == 0) {
+                await db.addusertotournament(request.session.username, id);
+                response.render("home.ejs", {
+                    status: "Thank you for registering to " + id
+                });
+            } else {
+                response.render("allTournaments.ejs", {
+                    error: "You are already registered to that tournament!",
+                    tournaments: tournaments
+                });
+
+            }
             //response.render('home.ejs')
             response.end();
             return;
         }
     }
     if (request.session.loggedin) {
-         allT();
+        allT();
     } else
         response.send('Please login to view this page!');
     //start of code to show all avaliable tournaments
     //we need database code to back this up 
     //need ejs to display out to user.
-    
+
 
 });
 
@@ -198,7 +210,7 @@ app.post('/registerTournament', function(request, response) {
             //all from user input post request
             var tName = request.body.tournamentName;
             var type = request.body.type;
-            var format= request.body.format;
+            var format = request.body.format;
             var style = request.body.style;
             var location = request.body.location;
             var end = request.body.end;
@@ -208,8 +220,8 @@ app.post('/registerTournament', function(request, response) {
             var username = request.session.username;
 
             const db = await new Database();
-            
-            db.tournamentadd(tName, type,format, style,location, username, start,end);
+
+            db.tournamentadd(tName, type, format, style, location, username, start, end);
         }
         //database calls need to be done async
         registration();
@@ -220,8 +232,9 @@ app.post('/registerTournament', function(request, response) {
 
     } finally {
         //response.end();
-        response.render("home.ejs",{
-            status: "Thank you for registering the tournament!"});
+        response.render("home.ejs", {
+            status: "Thank you for registering the tournament!"
+        });
     }
 });
 
