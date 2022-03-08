@@ -38,7 +38,8 @@ class Database {
                 password: passHex,
                 registeredToo: null,
                 win: 0,
-                loss: 0
+                loss: 0,
+                ongoingTournament: false
             }
 
             let res = await collection.insertOne(query);
@@ -54,9 +55,60 @@ class Database {
         }
 
 
+
+
     }
 
-    //checks to see if user exists for login registering a user
+    //get all of user info for any operations we may need to do later
+    async getUser(username) {
+            const client = await MongoClient.connect(config.DB_URI, { useNewUrlParser: true })
+                .catch(err => { console.log(err); });
+
+            if (!client) {
+                return;
+            }
+
+            try {
+
+                const db = client.db("Capstone");
+
+                let collection = db.collection('users');
+
+                let query = {
+                    username: username,
+                }
+
+                let res = await collection.findOne(query);
+
+                var obj = [{}];
+
+
+                //do the time verificaiton in servrr file
+                obj.push({
+                    user: res.username,
+                    registeredToo: res.registeredToo,
+                    win: res.win,
+                    loss: res.loss,
+
+                    ongoingTournament: res.ongoingTournament
+                });
+
+                console.log(obj[1].user);
+
+            } catch (err) {
+
+                console.log(err);
+            } finally {
+
+                client.close();
+                return obj;
+            }
+
+
+
+
+        }
+        //checks to see if user exists for login registering a user
     async checkUser(username) {
         const client = await MongoClient.connect(config.DB_URI, { useNewUrlParser: true })
             .catch(err => { console.log(err); });
@@ -79,8 +131,7 @@ class Database {
 
             console.log("user checked")
 
-            client.close();
-            return res;
+
 
         } catch (err) {
 

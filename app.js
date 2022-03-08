@@ -39,17 +39,27 @@ app.get('/home', function(request, response) {
 });
 
 app.get('/account', function(request, response) {
-    response.render('account.ejs', {
-        displayinfo: null
-    });
 
-    var id = request.query.id;
+    const db = new Database();
+    async function account() {
+        try {
 
-    if (id == "about") {
-        response.render('account.ejs', {
-            displayinfo: "Test"
-        })
+            var obj = await db.getUser(request.session.username);
+
+
+
+
+            response.render('account.ejs', {
+                win: obj[1].win,
+                loss: obj[1].loss,
+                user: obj[1].user,
+                ongoingTournament: obj[1].ongoingTournament
+            });
+        } catch (e) {
+            response.render(errorpage);
+        }
     }
+    account();
 });
 
 
