@@ -128,6 +128,15 @@ app.get("/allTournaments", function(request, response) {
 
 });
 
+
+
+// get for account page about 
+app.get("/account/About", function(request, response) {
+    response.render("about.ejs", {
+
+    });
+
+});
 ////////////////////////////////
 //posts
 ////////////////////////////////
