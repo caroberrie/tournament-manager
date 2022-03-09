@@ -1,33 +1,35 @@
 //manager for passwords for database
 // crypto module
-const crypto = require("crypto");
+
+const bcrypt = require("bcrypt");
 
 //password stuff
 //work via magic of cryptography
+//swapping to be bcrypt node default crypto kind of a mess
+
+
+saltRounds = 10;
 
 class pwManage {
+    constructor() {}
     async passSet(password) {
-        return new Promise((resolve, reject) => {
-            // generate random 16 bytes long salt
-            const salt = crypto.randomBytes(16).toString("hex")
 
-            crypto.scrypt(password, salt, 64, (err, derivedKey) => {
-                if (err) reject(err);
-                resolve(salt + ":" + derivedKey.toString('hex'))
-            });
-        })
+        var hex;
+        await bcrypt.hash(password, saltRounds).then(function(hash) {
+            hex = hash;
+
+        });
+        return hex;
     };
-
 
     //password validation.
     async validPassword(password, hash) {
-        return new Promise((resolve, reject) => {
-            const [salt, key] = hash.split(":")
-            crypto.scrypt(password, salt, 64, (err, derivedKey) => {
-                if (err) reject(err);
-                resolve(key == derivedKey.toString('hex'))
-            });
-        })
+        var val;
+        await bcrypt.compare(password, hash).then(function(result) {
+            val = result;
+
+        });
+        return val;
     };
 
 

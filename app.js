@@ -119,6 +119,7 @@ app.get("/allTournaments", function(request, response) {
                 //need to check if user is already registered if so display an error at top of page and reload
                 if (await db.checkUserInTournament(request.session.username, id) == 0) {
                     await db.addusertotournament(request.session.username, id);
+                    await db.addTournToUser(id, request.session.username);
                     response.render("home.ejs", {
                         status: "Thank you for registering to " + id
                     });
@@ -197,10 +198,14 @@ app.post('/auth', function(request, response) {
     var pass = request.body.password;
 
     request.session.username = user;
-    request.session.loggedin = true;
+
     async function login() {
         const db = await new Database();
-        if (await db.login(user.toString().toLowerCase(), pass)) { response.redirect('/home'); } else {
+        if (await db.login(user.toString().toLowerCase(), pass)) {
+            request.session.loggedin = true;
+            response.redirect('/home');
+
+        } else {
             response.render('login.ejs', {
                 error: "Password or username is incorrect"
             });

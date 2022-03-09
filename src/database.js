@@ -2,6 +2,7 @@ const config = require('./dev');
 const pwManage = require('./passwordmanager')
 const MongoClient = require('mongodb').MongoClient;
 const fs = require('fs');
+const bcrypt = require("bcrypt");
 //includes above
 
 //need to create trigger in mongoDB for this collection 
@@ -24,14 +25,18 @@ class Database {
 
         try {
 
+
+            saltRounds = 10;
             const db = client.db("Capstone");
 
             let collection = db.collection('users');
 
 
             const pw = await new pwManage();
+            let passHex = await pw.passSet(password);
 
-            var passHex = await pw.passSet(password);
+
+
 
             let query = {
                 username: username,
@@ -196,7 +201,11 @@ class Database {
 
             let collection = db.collection('users');
 
+            let query = {
+                username: user,
+            }
 
+            let res = await collection.findOne(query);
 
             passBool = await pw.validPassword(password, res.password)
 
