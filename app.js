@@ -33,109 +33,157 @@ app.get('/', function(request, response) {
 
 
 app.get('/home', function(request, response) {
-    response.render("home.ejs", {
-        status: "Welcome " + request.session.username
-    });
+
+
+    if (request.session.loggedin) {
+        response.render("home.ejs", {
+            status: "Welcome " + request.session.username
+        });
+
+    } else {
+        response.send("you need to be signed in to see this page");
+    }
 });
+
 
 app.get('/account', function(request, response) {
+    if (request.session.loggedin) {
+        const db = new Database();
+        async function account() {
+            try {
 
-    const db = new Database();
-    async function account() {
-        try {
-
-            var obj = await db.getUser(request.session.username);
-
-
+                var obj = await db.getUser(request.session.username);
 
 
-            response.render('account.ejs', {
-                win: obj[1].win,
-                loss: obj[1].loss,
-                user: obj[1].user,
-                ongoingTournament: obj[1].ongoingTournament
-            });
-        } catch (e) {
-            response.render(errorpage);
+
+
+                response.render('account.ejs', {
+                    win: obj[1].win,
+                    loss: obj[1].loss,
+                    user: obj[1].user,
+                    ongoingTournament: obj[1].ongoingTournament
+                });
+            } catch (e) {
+                response.render(errorpage);
+            }
         }
+        account();
+
+    } else {
+        response.send("you need to be signed in to see this page");
     }
-    account();
 });
-
-
 
 //register no
 app.get('/register', function(request, response) {
     response.render('registration.ejs', {
         error: null
     });
+
 });
 
 
 app.get('/tournamentregister', function(request, response) {
-    response.render('tournamentregister.ejs', {
-        error: null
-    });
+    if (request.session.loggedin) {
+        response.render('tournamentregister.ejs', {
+            error: null
+        });
+    } else {
+        response.send("you need to be signed in to see this page");
+
+    }
 });
 
 
 app.get("/allTournaments", function(request, response) {
-    var id = request.query.id;
+    if (request.session.loggedin) {
+        var id = request.query.id;
 
-    console.log(id);
-    async function allT() {
-        const db = new Database();
-        var tournaments = await db.allTourn();
-        //for (tournaments.time > Date.now()){ 
-        //now do tournament.time to make new obj containing proper ones to display 
-        //};
-        //add time verfication from tournaments
-        if (id == null) {
-            response.render("allTournaments.ejs", {
-                error: null,
-                tournaments: tournaments
-            });
-            response.end();
-        }
-
-        if (id != null) {
-            //need to check if user is already registered if so display an error at top of page and reload
-            if (await db.checkUserInTournament(request.session.username, id) == 0) {
-                await db.addusertotournament(request.session.username, id);
-                response.render("home.ejs", {
-                    status: "Thank you for registering to " + id
-                });
-            } else {
+        console.log(id);
+        async function allT() {
+            const db = new Database();
+            var tournaments = await db.allTourn();
+            //for (tournaments.time > Date.now()){ 
+            //now do tournament.time to make new obj containing proper ones to display 
+            //};
+            //add time verfication from tournaments
+            if (id == null) {
                 response.render("allTournaments.ejs", {
-                    error: "You are already registered to that tournament!",
+                    error: null,
                     tournaments: tournaments
                 });
-
+                response.end();
             }
-            //response.render('home.ejs')
-            response.end();
-            return;
+
+            if (id != null) {
+                //need to check if user is already registered if so display an error at top of page and reload
+                if (await db.checkUserInTournament(request.session.username, id) == 0) {
+                    await db.addusertotournament(request.session.username, id);
+                    response.render("home.ejs", {
+                        status: "Thank you for registering to " + id
+                    });
+                } else {
+                    response.render("allTournaments.ejs", {
+                        error: "You are already registered to that tournament!",
+                        tournaments: tournaments
+                    });
+
+                }
+                //response.render('home.ejs')
+                response.end();
+                return;
+            }
         }
-    }
-    if (request.session.loggedin) {
-        allT();
-    } else
+        if (request.session.loggedin) {
+            allT();
+        } else
+            response.send('Please login to view this page!');
+        //start of code to show all avaliable tournaments
+        //we need database code to back this up 
+        //need ejs to display out to user.
+
+    } else {
         response.send('Please login to view this page!');
-    //start of code to show all avaliable tournaments
-    //we need database code to back this up 
-    //need ejs to display out to user.
-
-
+    }
 });
 
 
 
 // get for account page about 
 app.get("/account/About", function(request, response) {
-    response.render("about.ejs", {
+    if (request.session.loggedin) {
+        response.render("about.ejs", {
 
-    });
+        });
+    } else {
+        response.send('Please login to view this page!');
+    }
+});
 
+app.get("/account/yourTournaments", function(request, response) {
+    if (request.session.loggedin) {
+        response.render("yourTournaments.ejs", {
+
+        });
+    } else {
+        response.send('Please login to view this page!');
+    }
+});
+app.get("/account/registeredTournament", function(request, response) {
+    if (request.session.loggedin) {
+        response.render("registeredTournament.ejs", {
+
+        });
+    } else {
+        response.send('Please login to view this page!');
+    }
+});
+
+app.get("/signout", function(request, response) {
+    request.session.loggedin = false;
+    response.render("login.ejs", {
+        error: null
+    })
 });
 ////////////////////////////////
 //posts
