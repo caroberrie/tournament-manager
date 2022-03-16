@@ -1,10 +1,9 @@
 const Database = require('./database')
-
+const moment = require('moment')
 
 async function populateDB() {
     const db = await new Database();
-    await db.addUser("math", "math2")
-    console.log(await db.login("math", "math2"));
-
+    console.log(moment().format('LTS'));
+    
 }
 populateDB();
