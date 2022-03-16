@@ -217,7 +217,7 @@ class Database {
         }
     }
 
-    async tournamentadd(name, type, format, style, location, owner, start, end) {
+    async tournamentadd(name, type, format, style, location, owner, start, date) {
         const client = await MongoClient.connect(config.DB_URI, { useNewUrlParser: true })
             .catch(err => { console.log(err); });
 
@@ -244,7 +244,7 @@ class Database {
                 location: location,
                 owner: owner,
                 start: start,
-                end: end
+                date: date
             }
 
             let res = await collection.insertOne(query);

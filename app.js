@@ -171,13 +171,26 @@ app.get("/account/yourTournaments", function(request, response) {
     }
 });
 app.get("/account/registeredTournament", function(request, response) {
+    async function goh(){
     if (request.session.loggedin) {
+        const db = new Database();
+        var val = await db.getUser(request.session.username);
+        //console.log(val[1].registeredToo[0]);
+        //once the hit the href we need to go that id tournament and grabs that tournaments info such as registered user and get scores things of that nature 
+        //on this page tho we should probably display relavent info such as registrered to and what not that makes the most sense
+        //such as start time comment things of that nature
+        //needs date validation like everything does lol
+
         response.render("registeredTournament.ejs", {
+            tournaments: val[1].registeredToo,
+            error: null
 
         });
     } else {
         response.send('Please login to view this page!');
     }
+    }
+    goh();
 });
 
 app.get("/signout", function(request, response) {

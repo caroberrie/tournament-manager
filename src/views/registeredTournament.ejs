@@ -18,6 +18,8 @@
     table {
         border-collapse: separate;
         border-spacing: 0 15px;
+        margin-left: auto;
+        margin-right: auto;
     }
     
     th {
@@ -31,6 +33,7 @@
         text-align: center;
         border: 1px solid black;
         padding: 5px;
+        
     }
     
     h2 {
@@ -54,39 +57,21 @@
             </header>
             <span style="color: #ff0000"><%= error %></span>
             <main>
-                <table>
+                <table class="center" >
                     <tr>
                         <th>Name</th>
-                        <th>Type </th>
-                        <th>Format</th>
-                        <th>Style</th>
-                        <th>Location</th>
-                        <th>Start</th>
+                        <th>Go To Tournament </th>
+                       
 
                     </tr>
                     <tr>
-                        <% for(var i=1; i<tournaments.length; i++){ %>
+                        <% for(var i=0; i<tournaments.length; i++){ %>
                             <tr>
                                 <td>
-                                    <%= tournaments[i].name %>
+                                    <%= tournaments[i] %>
                                 </td>
                                 <td>
-                                    <%= tournaments[i].type %>
-                                </td>
-                                <td>
-                                    <%= tournaments[i].format %>
-                                </td>
-                                <td>
-                                    <%= tournaments[i].style %>
-                                </td>
-                                <td>
-                                    <%= tournaments[i].location %>
-                                </td>
-                                <td>
-                                    <%= tournaments[i].start %>
-                                </td>
-                                <td>
-                                    <a href="/allTournaments?id=<%= tournaments[i].name %>" id=<%=t ournaments[i].name %>>Add</a>
+                                    <a href="/allTournaments?id=<%=tournaments[i].name %>" id=<%=tournaments[i].name %>>Go To</a>
 
 
 
