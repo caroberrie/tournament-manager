@@ -99,7 +99,7 @@ app.get("/allTournaments", function(request, response) {
     if (request.session.loggedin) {
         var id = request.query.id;
 
-        console.log(id);
+        //console.log(id);
         async function allT() {
             const db = new Database();
             var tournaments = await db.allTourn();
@@ -119,6 +119,7 @@ app.get("/allTournaments", function(request, response) {
                 //need to check if user is already registered if so display an error at top of page and reload
                 if (await db.checkUserInTournament(request.session.username, id) == 0) {
                     await db.addusertotournament(request.session.username, id);
+                    //0name 1time 2date appended like that 
                     await db.addTournToUser(id, request.session.username);
                     response.render("home.ejs", {
                         status: "Thank you for registering to " + id
