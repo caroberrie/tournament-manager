@@ -8,6 +8,7 @@ const e = require('express');
 const { request } = require('http');
 const { response } = require('express');
 const { stringify } = require('querystring');
+const { DB_URI } = require('./src/dev.js');
 
 const router = express.Router();
 
@@ -200,6 +201,22 @@ app.get("/signout", function(request, response) {
         error: null
     })
 });
+
+app.get("/currentTourn", function(request, response) {
+    id = request.query.id;
+    go();
+    async function go(){
+        const db = new Database();
+        obj = db.getUsersinTourn(id);
+        
+        //make function to retrieve database data
+        //package data
+        //send to html page that has a post for report data
+        
+    };
+
+});
+
 ////////////////////////////////
 //posts
 ////////////////////////////////
@@ -299,7 +316,7 @@ app.post('/registerTournament', function(request, response) {
             var format = request.body.format;
             var style = request.body.style;
             var location = request.body.location;
-            var end = request.body.end;
+            var date = request.body.date;
             var start = request.body.start;
 
             //need to grab username in a different wat
@@ -307,7 +324,7 @@ app.post('/registerTournament', function(request, response) {
 
             const db = await new Database();
 
-            db.tournamentadd(tName, type, format, style, location, username, start, end);
+            db.tournamentadd(tName, type, format, style, location, username, start, date);
         }
         //database calls need to be done async
         registration();
