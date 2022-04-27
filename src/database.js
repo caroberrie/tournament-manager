@@ -45,7 +45,7 @@ class Database {
                 registeredToo: [],
                 win: 0,
                 loss: 0,
-                ongoingTournament: false
+                owns: [] 
             }
 
             let res = await collection.insertOne(query);
@@ -268,7 +268,7 @@ class Database {
         }
     }
 
-    async tournamentadd(name, type, format, style, location, owner, start, date) {
+    async tournamentadd(name, type, format, style, location, owner, start, date,user) {
         const client = await MongoClient.connect(config.DB_URI, { useNewUrlParser: true })
             .catch(err => { console.log(err); });
 
@@ -299,6 +299,15 @@ class Database {
             }
 
             let res = await collection.insertOne(query);
+
+            let collection2 = db.collection('users');
+
+            let query2 = { username : user };
+
+            let res2 = await collection2.findOne(query2);
+
+            await collection.updateOne(query, { $push: { registeredToo: tourn}});
+            
 
 
         } finally {
@@ -333,9 +342,9 @@ class Database {
             //list of who to play
             let query = {
                 username: username,
-                wins: null,
-                loss: null,
-                draw: null,
+                wins: 0,
+                loss: 0,
+                draw: 0,
                 playnext: null,
                 listtoplay: null,
             }
@@ -425,9 +434,9 @@ class Database {
             //allows us to use an array of all registered to currently
             //will use valid time to check if the user can see them allows to keep a lot running list of what thye have been registered to in the past
 
-            let res = await collection.updateOne(query, { $push: { registeredToo: tourn}});
-            let res3 = await collection.updateOne(query, { $push: { registeredToo: res2.start} });
-            let res4 = collection.updateOne(query, { $push: { registeredToo: res2.date} });
+            await collection.updateOne(query, { $push: { registeredToo: tourn}});
+             await collection.updateOne(query, { $push: { registeredToo: res2.start} });
+             await collection.updateOne(query, { $push: { registeredToo: res2.date} });
         } catch (err) {
 
             console.log(err);

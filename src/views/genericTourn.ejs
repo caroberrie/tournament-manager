@@ -60,22 +60,32 @@
                 <table class="center" >
                     <tr>
                         <th>Name</th>
-                        <th>Go To Tournament </th>
-                       
+                        <th>Wins</th>
+                        <th>Losses </th>
+                        <th>Draws</th>
+                        <th>Playnext</th>
+                        
 
                     </tr>
                     <tr>
-                        <% for(var i=0; i<tournaments.length; i=i+3){ %>
+                        <% for(var i=1; i<users.length; i++){ %>
                             <tr>
                                 <td>
-                                    <%= tournaments[i] %>
+                                    <%= users[i].username %>
                                 </td>
                                 <td>
-                                    <a href="/allTournaments?id=<%=tournaments[i].name %>" id=<%=tournaments[i].name %>>Go To</a>
-
-
-
+                                    <%= users[i].wins %>
                                 </td>
+                                <td>
+                                    <%= users[i].loss %>
+                                </td>
+                                <td>
+                                    <%= users[i].draw %>
+                                </td>
+                                <td>
+                                    <%= users[i].playnext %>
+                                </td>
+                              
                             </tr>
                             <% } %>
                     </tr>

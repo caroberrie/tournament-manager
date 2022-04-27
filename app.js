@@ -206,9 +206,14 @@ app.get("/currentTourn", function(request, response) {
     id = request.query.id;
     go();
     async function go(){
-        const db = new Database();
-        obj = db.getUsersinTourn(id);
+     
+        const db =await new Database();
+        var obj = await db.getUsersinTourn(id);
         
+        response.render("genericTourn.ejs", {
+            error: null,
+            users: obj
+        })
         //make function to retrieve database data
         //package data
         //send to html page that has a post for report data
@@ -341,7 +346,9 @@ app.post('/registerTournament', function(request, response) {
     }
 });
 
-
+app.post('/distance',function(request,response){
+    
+});
 
 //wep bage setup stuff
 //not https
