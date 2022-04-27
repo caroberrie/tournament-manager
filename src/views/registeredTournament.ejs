@@ -65,13 +65,13 @@
 
                     </tr>
                     <tr>
-                        <% for(var i=0; i<tournaments.length; i++){ %>
+                        <% for(var i=0; i<tournaments.length; i=i+3){ %>
                             <tr>
                                 <td>
                                     <%= tournaments[i] %>
                                 </td>
                                 <td>
-                                    <a href="/allTournaments?id=<%=tournaments[i].name %>" id=<%=tournaments[i].name %>>Go To</a>
+                                    <a href="/currentTourn?id=<%=tournaments[i]%>" id=<%=tournaments[i] %>>Go To</a>
 
 
 

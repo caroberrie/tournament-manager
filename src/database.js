@@ -3,6 +3,7 @@ const pwManage = require('./passwordmanager')
 const MongoClient = require('mongodb').MongoClient;
 const fs = require('fs');
 const bcrypt = require("bcrypt");
+const res = require('express/lib/response');
 //includes above
 
 //need to create trigger in mongoDB for this collection 
@@ -44,7 +45,7 @@ class Database {
                 registeredToo: [],
                 win: 0,
                 loss: 0,
-                ongoingTournament: false
+                owns: [] 
             }
 
             let res = await collection.insertOne(query);
@@ -99,6 +100,56 @@ class Database {
                 });
 
                 console.log(obj[1].user);
+
+            } catch (err) {
+
+                console.log(err);
+            } finally {
+
+                client.close();
+                return obj;
+            }
+
+
+
+
+        }async getTourn(tournName) {
+            const client = await MongoClient.connect(config.DB_URI, { useNewUrlParser: true })
+                .catch(err => { console.log(err); });
+
+            if (!client) {
+                return;
+            }
+
+            try {
+
+                const db = client.db("Capstone");
+
+                let collection = db.collection('tournaments');
+
+                let query = {
+                    name: tournName,
+                }
+
+                let res = await collection.findOne(query);
+
+                var obj = [{}];
+
+
+                //do the time verificaiton in servrr file
+                obj.push({
+                    name: res.name,
+                    type: res.type,
+                    format: res.format,
+                style: res.style,
+                location: res.location,
+                owner: res.owner,
+                start: res.start,
+
+                    date: res.date
+                });
+
+                console.log(obj[1].name);
 
             } catch (err) {
 
@@ -217,7 +268,7 @@ class Database {
         }
     }
 
-    async tournamentadd(name, type, format, style, location, owner, start, date) {
+    async tournamentadd(name, type, format, style, location, owner, start, date,user) {
         const client = await MongoClient.connect(config.DB_URI, { useNewUrlParser: true })
             .catch(err => { console.log(err); });
 
@@ -248,6 +299,15 @@ class Database {
             }
 
             let res = await collection.insertOne(query);
+
+            let collection2 = db.collection('users');
+
+            let query2 = { username : user };
+
+            let res2 = await collection2.findOne(query2);
+
+            await collection.updateOne(query, { $push: { registeredToo: tourn}});
+            
 
 
         } finally {
@@ -282,9 +342,9 @@ class Database {
             //list of who to play
             let query = {
                 username: username,
-                wins: null,
-                loss: null,
-                draw: null,
+                wins: 0,
+                loss: 0,
+                draw: 0,
                 playnext: null,
                 listtoplay: null,
             }
@@ -359,14 +419,24 @@ class Database {
 
             let query = { username: user }
 
+            let collection2 = db.collection('tournaments');
+
+            let query2 = { name : tourn};
+
+            let res2 = await collection2.findOne(query2);
+
+            console.log(res2.start);
+
+        
             // let res = await collection.findOne(query);
 
             //append to end of array in documents using push
             //allows us to use an array of all registered to currently
             //will use valid time to check if the user can see them allows to keep a lot running list of what thye have been registered to in the past
 
-            let res = await collection.updateOne(query, { $push: { registeredToo: tourn } });
-
+            await collection.updateOne(query, { $push: { registeredToo: tourn}});
+             await collection.updateOne(query, { $push: { registeredToo: res2.start} });
+             await collection.updateOne(query, { $push: { registeredToo: res2.date} });
         } catch (err) {
 
             console.log(err);
@@ -379,8 +449,48 @@ class Database {
         }
 
     }
-}
+    async getUsersinTourn(tourn) {
+    const client = await MongoClient.connect(config.DB_URI, { useNewUrlParser: true })
+                .catch(err => { console.log(err); });
 
+            if (!client) {
+                return;
+            }
+
+            try {
+                const db = client.db("Capstone");
+
+
+
+                let collection = db.collection(tourn);
+
+                var obj = [{}];
+
+                for await (const doc of collection.find()) {
+                    //do the time verificaiton in servrr file
+                    obj.push({
+                        username: doc.username,
+                        wins: doc.wins,
+                        loss: doc.loss,
+                        draw: doc.draw,
+                        playnext: doc.playnext,
+                        listtoplay: doc.listtoplay
+                    });
+                    //buildstring = "Name: " + doc.name + " Location: " + doc.location + "\n" + buildstring;
+                    // Prints documents one at a time
+                }
+
+            } catch (err) {
+
+                console.log(err);
+            } finally {
+
+                client.close();
+                //console.log(buildstring); //test to see if string is made right
+                return obj;
+            }
+        }
+}
 
 
 module.exports = Database;

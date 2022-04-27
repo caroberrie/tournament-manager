@@ -8,6 +8,7 @@ const e = require('express');
 const { request } = require('http');
 const { response } = require('express');
 const { stringify } = require('querystring');
+const { DB_URI } = require('./src/dev.js');
 
 const router = express.Router();
 
@@ -99,7 +100,7 @@ app.get("/allTournaments", function(request, response) {
     if (request.session.loggedin) {
         var id = request.query.id;
 
-        console.log(id);
+        //console.log(id);
         async function allT() {
             const db = new Database();
             var tournaments = await db.allTourn();
@@ -119,6 +120,7 @@ app.get("/allTournaments", function(request, response) {
                 //need to check if user is already registered if so display an error at top of page and reload
                 if (await db.checkUserInTournament(request.session.username, id) == 0) {
                     await db.addusertotournament(request.session.username, id);
+                    //0name 1time 2date appended like that 
                     await db.addTournToUser(id, request.session.username);
                     response.render("home.ejs", {
                         status: "Thank you for registering to " + id
@@ -199,6 +201,27 @@ app.get("/signout", function(request, response) {
         error: null
     })
 });
+
+app.get("/currentTourn", function(request, response) {
+    id = request.query.id;
+    go();
+    async function go(){
+     
+        const db =await new Database();
+        var obj = await db.getUsersinTourn(id);
+        
+        response.render("genericTourn.ejs", {
+            error: null,
+            users: obj
+        })
+        //make function to retrieve database data
+        //package data
+        //send to html page that has a post for report data
+        
+    };
+
+});
+
 ////////////////////////////////
 //posts
 ////////////////////////////////
@@ -298,7 +321,7 @@ app.post('/registerTournament', function(request, response) {
             var format = request.body.format;
             var style = request.body.style;
             var location = request.body.location;
-            var end = request.body.end;
+            var date = request.body.date;
             var start = request.body.start;
 
             //need to grab username in a different wat
@@ -306,7 +329,7 @@ app.post('/registerTournament', function(request, response) {
 
             const db = await new Database();
 
-            db.tournamentadd(tName, type, format, style, location, username, start, end);
+            db.tournamentadd(tName, type, format, style, location, username, start, date);
         }
         //database calls need to be done async
         registration();
@@ -323,7 +346,9 @@ app.post('/registerTournament', function(request, response) {
     }
 });
 
-
+app.post('/distance',function(request,response){
+    
+});
 
 //wep bage setup stuff
 //not https
