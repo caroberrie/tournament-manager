@@ -388,6 +388,7 @@ class Database {
                         location: doc.location,
                         owner: doc.owner,
                         time: doc.start,
+                        date: doc.date,
                         zipcode: doc.zipcode
                     });
                     //buildstring = "Name: " + doc.name + " Location: " + doc.location + "\n" + buildstring;

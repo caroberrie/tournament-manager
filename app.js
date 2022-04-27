@@ -111,9 +111,24 @@ app.get("/allTournaments", function(request, response) {
             //};
             //add time verfication from tournaments
             if (id == null) {
+                validtourns = [{}];
+                for(i=1;i < tournaments.length;i++){
+                    
+                    //tournaments[i].zipcode
+                   // let zipCodeDistance = zipCodeData.zipCodeDistance(zipcodeenter, tournaments[i].zipcode,'M');
+                   // let tourndate = tournaments[i].date;
+                  // console.log(mtournaments[i]);//.isAfter(moment()));
+                    if(moment(tournaments[i].date).isAfter(moment())){
+                       validtourns.push({name:tournaments[i].name,
+                        type:tournaments[i].type,
+                        format:tournaments[i].format,
+                        style:tournaments[i].style,
+                        location:tournaments[i].location,
+                        start:tournaments[i].start});
+                    }}
                 response.render("allTournaments.ejs", {
                     error: null,
-                    tournaments: tournaments
+                    tournaments: validtourns
                 });
                 response.end();
             }
@@ -368,11 +383,12 @@ app.post('/distance',function(request,response){
             //console.log(tournaments);
             if (id == null) {
                 for(i=1;i < tournaments.length;i++){
-                  
+                    
                     //tournaments[i].zipcode
                     let zipCodeDistance = zipCodeData.zipCodeDistance(zipcodeenter, tournaments[i].zipcode,'M');
-                    console.log(moment(moment().year(year).month(month).date(day)).isBefore(tournaments.date));
-                    if( zipCodeDistance <= distance && moment(moment().year(year).month(month).date(day)).isBefore(tournaments.date)){
+                   // let tourndate = tournaments[i].date;
+                  // console.log(mtournaments[i]);//.isAfter(moment()));
+                    if( zipCodeDistance <= distance && moment(tournaments[i].date).isAfter(moment())){
                        validtourns.push({name:tournaments[i].name,
                         type:tournaments[i].type,
                         format:tournaments[i].format,
