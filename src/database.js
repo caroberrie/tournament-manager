@@ -268,7 +268,7 @@ class Database {
         }
     }
 
-    async tournamentadd(name, type, format, style, location, owner, start, date,user) {
+    async tournamentadd(name, type, format, style, location, owner, start, date,zipcode) {
         const client = await MongoClient.connect(config.DB_URI, { useNewUrlParser: true })
             .catch(err => { console.log(err); });
 
@@ -295,18 +295,19 @@ class Database {
                 location: location,
                 owner: owner,
                 start: start,
-                date: date
+                date: date,
+                zipcode: zipcode
             }
 
             let res = await collection.insertOne(query);
 
-            let collection2 = db.collection('users');
+           // let collection2 = db.collection('users');
 
-            let query2 = { username : user };
+           // let query2 = { username : user };
 
-            let res2 = await collection2.findOne(query2);
+            //let res2 = await collection2.findOne(query2);
 
-            await collection.updateOne(query, { $push: { registeredToo: tourn}});
+            //await collection.updateOne(query, { $push: { registeredToo: tourn}});
             
 
 
@@ -386,7 +387,8 @@ class Database {
                         style: doc.style,
                         location: doc.location,
                         owner: doc.owner,
-                        time: doc.start
+                        time: doc.start,
+                        zipcode: doc.zipcode
                     });
                     //buildstring = "Name: " + doc.name + " Location: " + doc.location + "\n" + buildstring;
                     // Prints documents one at a time

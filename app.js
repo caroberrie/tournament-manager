@@ -9,6 +9,8 @@ const { request } = require('http');
 const { response } = require('express');
 const { stringify } = require('querystring');
 const { DB_URI } = require('./src/dev.js');
+const zipCodeData = require('zipcode-city-distance');
+const moment = require('moment');
 
 const router = express.Router();
 
@@ -323,13 +325,14 @@ app.post('/registerTournament', function(request, response) {
             var location = request.body.location;
             var date = request.body.date;
             var start = request.body.start;
+            var zipcode = request.body.zipcode;
 
             //need to grab username in a different wat
             var username = request.session.username;
 
             const db = await new Database();
 
-            db.tournamentadd(tName, type, format, style, location, username, start, date);
+            db.tournamentadd(tName, type, format, style, location, username, start, date, zipcode);
         }
         //database calls need to be done async
         registration();
@@ -347,7 +350,80 @@ app.post('/registerTournament', function(request, response) {
 });
 
 app.post('/distance',function(request,response){
-    
+    if (request.session.loggedin) {
+        var id = request.query.id;
+        var zipcodeenter = request.body.zipcode;
+        var distance = request.body.distancefrom;
+        //console.log(zipcodeenter);
+        //console.log(id);
+        async function allT() {
+            const db = new Database();
+            var tournaments = await db.allTourn();
+            //for (tournaments.time > Date.now()){ 
+            //now do tournament.time to make new obj containing proper ones to display 
+            //};   
+            //add time verfication from tournaments
+            //console.log(tournaments.length);
+            var validtourns=[{}];
+            //console.log(tournaments);
+            if (id == null) {
+                for(i=1;i < tournaments.length;i++){
+                  
+                    //tournaments[i].zipcode
+                    let zipCodeDistance = zipCodeData.zipCodeDistance(zipcodeenter, tournaments[i].zipcode,'M');
+                    console.log(moment(moment().year(year).month(month).date(day)).isBefore(tournaments.date));
+                    if( zipCodeDistance <= distance && moment(moment().year(year).month(month).date(day)).isBefore(tournaments.date)){
+                       validtourns.push({name:tournaments[i].name,
+                        type:tournaments[i].type,
+                        format:tournaments[i].format,
+                        style:tournaments[i].style,
+                        location:tournaments[i].location,
+                        start:tournaments[i].start});
+                       
+
+                    } 
+                    //console.log(tournaments[5])
+                     //  console.log(validtourns)
+                }
+                response.render("allTournaments.ejs", {
+                    error: null,
+                    tournaments: validtourns
+                });
+                response.end();
+            }
+
+            if (id != null) {
+                //need to check if user is already registered if so display an error at top of page and reload
+                if (await db.checkUserInTournament(request.session.username, id) == 0) {
+                    await db.addusertotournament(request.session.username, id);
+                    //0name 1time 2date appended like that 
+                    await db.addTournToUser(id, request.session.username);
+                    response.render("home.ejs", {
+                        status: "Thank you for registering to " + id
+                    });
+                } else {
+                    response.render("allTournaments.ejs", {
+                        error: "You are already registered to that tournament!",
+                        tournaments: tournaments
+                    });
+
+                }
+                //response.render('home.ejs')
+                response.end();
+                return;
+            }
+        }
+        if (request.session.loggedin) {
+            allT();
+        } else
+            response.send('Please login to view this page!');
+        //start of code to show all avaliable tournaments
+        //we need database code to back this up 
+        //need ejs to display out to user.
+
+    } else {
+        response.send('Please login to view this page!');
+    }
 });
 
 //wep bage setup stuff

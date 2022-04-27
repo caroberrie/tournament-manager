@@ -36,11 +36,26 @@
     </style>
 </head>
 
+
+
 <body class="container">
 
     <header>
         <%- include('./partials/header.ejs'); %>
     </header>
+    <label for="Distance">Max distance:</label>
+    <form action="distance" method="POST">
+<select name="distancefrom" required>
+    <option value="10">10</option>
+    <option value="25">25</option>
+    <option value="50">50</option>
+    <option value="100">100</option>
+  </select>
+  
+
+    <input type="zipcode" name="zipcode" placeholder="Zip Code" required>
+    <input type="submit" value="Find distance">
+
     <span style="color: #ff0000"><%= error %></span>
     <main>
         <table>
