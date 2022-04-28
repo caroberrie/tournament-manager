@@ -181,13 +181,40 @@ app.get("/account/About", function(request, response) {
 });
 
 app.get("/account/yourTournaments", function(request, response) {
-    if (request.session.loggedin) {
-        response.render("yourTournaments.ejs", {
+    
+    async function goh(){
+        if (request.session.loggedin) {
+            const db = new Database();
+            var val = await db.allTourn();
+            var use = request.session.username;
+            //console.log(val[1].registeredToo[0]);
+            //once the hit the href we need to go that id tournament and grabs that tournaments info such as registered user and get scores things of that nature 
+            //on this page tho we should probably display relavent info such as registrered to and what not that makes the most sense
+            //such as start time comment things of that nature
+            //needs date validation like everything does lol
+            var valid=[];
+            for await (const doc of val) {
+                console.log(doc.owner)
+                if(use == doc.owner){
 
-        });
-    } else {
-        response.send('Please login to view this page!');
-    }
+                    valid.push(doc.name);
+                }
+            }
+                //console.log(valid);
+                if (request.session.loggedin) {
+                    response.render("yourTournaments.ejs", {
+                        tournaments: valid,
+                        error: null
+                    });
+        } else {
+            response.send('Please login to view this page!');
+        }
+        }
+      
+    
+    
+    
+}  goh();
 });
 app.get("/account/registeredTournament", function(request, response) {
     async function goh(){
@@ -199,12 +226,20 @@ app.get("/account/registeredTournament", function(request, response) {
         //on this page tho we should probably display relavent info such as registrered to and what not that makes the most sense
         //such as start time comment things of that nature
         //needs date validation like everything does lol
-
+        var valid = [];
+        for(i=2;i <= val[1].registeredToo.length;i=i+3){
+            //console.log(val[1].registeredToo[i]);
+          //  console.log(moment(val[1].registeredToo[i]).isAfter(moment()));
+            if(moment(val[1].registeredToo[i]).isAfter(moment())){
+                
+                valid.push(val[1].registeredToo[i-2]);
+            }}
+            //console.log(valid);
         response.render("registeredTournament.ejs", {
-            tournaments: val[1].registeredToo,
+            tournaments: valid,
             error: null
 
-        });
+          });
     } else {
         response.send('Please login to view this page!');
     }

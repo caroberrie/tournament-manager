@@ -5,17 +5,89 @@
     <%- include('./partials/head.ejs'); %>
 </head>
 
+<meta charset="UTF-8">
+
+
+<!-- CSS (load bootstrap from a CDN) -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.5.2/css/bootstrap.min.css">
+<style>
+    body {
+        padding-top: 50px;
+    }
+    
+    table {
+        border-collapse: separate;
+        border-spacing: 0 15px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+    
+    th {
+        background-color: #4287f5;
+        color: white;
+    }
+    
+    th,
+    td {
+        width: 150px;
+        text-align: center;
+        border: 1px solid black;
+        padding: 5px;
+        
+    }
+    
+    h2 {
+        color: #4287f5;
+    }
+</style>
+</head>
 
 <body class="container">
 
-    <header>
-        <%- include('./partials/header.ejs'); %>
-    </header>
+
 
     <%- include('./partials/accountside.ejs'); %>
 
-        <main class="text-center">
-            constant eternal screaming about act 4 in p4s p2 :D
+
+
+        <body class="container">
+
+            <header>
+                <%- include('./partials/header.ejs'); %>
+            </header>
+            <span style="color: #ff0000"><%= error %></span>
+            <main>
+                <table class="center" >
+                    <tr>
+                        <th>Name</th>
+                        <th>Go To Tournament </th>
+                       
+
+                    </tr>
+                    <tr>
+                        <% for(var i=0; i<tournaments.length; i=i+1){ %>
+                            <tr>
+                                <td>
+                                    <%= tournaments[i] %>
+                                </td>
+                                <td>
+                                    <a href="/currentTourn?id=<%=tournaments[i]%>" id=<%=tournaments[i] %>>Go To</a>
+
+
+
+                                </td>
+                            </tr>
+                            <% } %>
+                    </tr>
+                </table>
+            </main>
+
+            <footer>
+                <%- include('./partials/footer.ejs'); %>
+            </footer>
+            <script>
+            </script>
+        </body>
         </main>
 
         <footer>
