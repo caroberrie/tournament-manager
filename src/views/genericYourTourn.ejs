@@ -39,6 +39,8 @@
     h2 {
         color: #4287f5;
     }
+    .buttonHolder{ text-align: center; }
+    
 </style>
 </head>
 
@@ -51,44 +53,56 @@
 
 
         <body class="container">
-
+            
             <header>
                 <%- include('./partials/header.ejs'); %>
             </header>
             <span style="color: #ff0000"><%= error %></span>
             <main>
-                <form action="start" method="POST">
-                   
+                
                     
-                        
-                        <input type="submit" value="Start Tournament" class="center">
+               
+                  
+                      
+                    <div class="buttonHolder">
+                         <form action="start" method="POST">
+                        <input value="Start Tournament" type="submit" value="start">
+                         </form>
+                         <form action="override" method="POST">
+                        <input value="Override" type="submit" value="override">
+                            </form>
+                      </div>
+                      
+                      
                 <table class="center" >
                     <tr>
                         <th>Name</th>
-                        <th>Date</th>
-                        <th>Start</th>
-                        <th>Go To Tournament </th>
-                       
+                        <th>Wins</th>
+                        <th>Losses </th>
+                        <th>Draws</th>
+                        <th>Playnext</th>
+                        
 
                     </tr>
                     <tr>
-                        <% for(var i=1; i<tournaments.length; i=i+1){ %>
+                        <% for(var i=1; i<users.length; i++){ %>
                             <tr>
                                 <td>
-                                    <%= tournaments[i].name %>
+                                    <%= users[i].username %>
                                 </td>
                                 <td>
-                                    <%= tournaments[i].date %>
+                                    <%= users[i].wins %>
                                 </td>
                                 <td>
-                                    <%= tournaments[i].start %>
+                                    <%= users[i].loss %>
                                 </td>
                                 <td>
-                                    <a href="/yourTourn?id=<%=tournaments[i].name%>" id=<%=tournaments[i].name %>>Go To</a>
-
-
-
+                                    <%= users[i].draw %>
                                 </td>
+                                <td>
+                                    <%= users[i].playnext %>
+                                </td>
+                              
                             </tr>
                             <% } %>
                     </tr>
@@ -103,7 +117,9 @@
         </body>
         </main>
 
-      
+        <footer>
+            <%- include('./partials/footer.ejs'); %>
+        </footer>
 
 
 

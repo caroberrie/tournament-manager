@@ -233,6 +233,8 @@ class Database {
 
             }
         }
+
+        
         //login code need to go passwordmanage to test and salt password
     async login(user, password) {
         const client = await MongoClient.connect(config.DB_URI, { useNewUrlParser: true })
@@ -347,7 +349,7 @@ class Database {
                 loss: 0,
                 draw: 0,
                 playnext: null,
-                listtoplay: null,
+                listtoplay: [],
             }
 
             let res = await collection.insertOne(query);
@@ -452,6 +454,7 @@ class Database {
         }
 
     }
+
     async getUsersinTourn(tourn) {
     const client = await MongoClient.connect(config.DB_URI, { useNewUrlParser: true })
                 .catch(err => { console.log(err); });
@@ -492,6 +495,76 @@ class Database {
                 //console.log(buildstring); //test to see if string is made right
                 return obj;
             }
+        }
+        async addToListToPlay(tourn,user,toplay){
+            const client = await MongoClient.connect(config.DB_URI, { useNewUrlParser: true })
+            .catch(err => { console.log(err); });
+
+        if (!client) {
+            return;
+        }
+
+        try {
+            const db = client.db("Capstone");
+
+
+
+            let collection = db.collection(tourn);
+
+            let query = {username: user};
+            //console.log(query)
+            //let update = { listtoplay:toplay}
+           await collection.findOneAndUpdate(query, { $push: { listtoplay: toplay}});
+                //do the time verificaiton in servrr file
+             
+                //buildstring = "Name: " + doc.name + " Location: " + doc.location + "\n" + buildstring;
+                // Prints documents one at a time
+            
+
+        } catch (err) {
+
+            console.log(err);
+        } finally {
+
+            client.close();
+            //console.log(buildstring); //test to see if string is made right
+            //return obj;
+        }
+        }
+        async updatePlayNext(tourn,user,toplay){
+            const client = await MongoClient.connect(config.DB_URI, { useNewUrlParser: true })
+            .catch(err => { console.log(err); });
+
+        if (!client) {
+            return;
+        }
+
+        try {
+            const db = client.db("Capstone");
+
+
+
+            let collection = db.collection(tourn);
+
+            let query = {username: user};
+            //console.log(query)
+            //let update = { listtoplay:toplay}
+           await collection.updateOne(query, {$set: {playnext: toplay}});
+                //do the time verificaiton in servrr file
+             
+                //buildstring = "Name: " + doc.name + " Location: " + doc.location + "\n" + buildstring;
+                // Prints documents one at a time
+            
+
+        } catch (err) {
+
+            console.log(err);
+        } finally {
+
+            client.close();
+            //console.log(buildstring); //test to see if string is made right
+            //return obj;
+        }
         }
 }
 
