@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>All Tournaments</title>
+
+    <!-- CSS (load bootstrap from a CDN) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body {
+            padding-top: 50px;
+        }
+        
+        table {
+            border-collapse: separate;
+            border-spacing: 0 15px;
+        }
+        
+        th {
+            background-color: #4287f5;
+            color: white;
+        }
+        
+        th,
+        td {
+            width: 150px;
+            text-align: center;
+            border: 1px solid black;
+            padding: 5px;
+        }
+        
+        h2 {
+            color: #4287f5;
+        }
+    </style>
+</head>
+
+
+
+<body class="container">
+
+    <header>
+        <%- include('./partials/header.ejs'); %>
+    </header>
+    
+  
+    <form action="override" method="post">
+    <label for="wins">Wins:</label>
+    <input type="wins" name="wins" placeholder="wins" required>
+    <label for="losses">Losses:</label>
+    <input type="loesses" name="losses" placeholder="Losses" required>        
+    <input type="submit" value="Override Selected user">
+
+
+    <span style="color: #ff0000"><%= error %></span>
+    
+            
+                <label for="Override">Override:</label>
+              
+           
+                
+           <select name="userto" required>
+                
+                <% for(var i=1; i<members.length; i++){ %>
+                    
+                    <option value="<%= members[i].username%>"><%= members[i].username %></option>                
+                      
+                    <% } %>
+                </select>
+            </form>
+    </main>
+
+    <footer>
+        <%- include('./partials/footer.ejs'); %>
+    </footer>
+
+</body>
+
+</html>

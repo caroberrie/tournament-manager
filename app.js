@@ -239,6 +239,7 @@ app.get("/signout", function (request, response) {
 
 app.get("/currentTourn", function (request, response) {
   id = request.query.id;
+  request.session.lastid = id;
   go();
   async function go() {
     const db = await new Database();
@@ -269,6 +270,33 @@ app.get("/yourTourn", function (request, response) {
     //make function to retrieve database data
     //package data
     //send to html page that has a post for report data
+  }
+});
+
+app.get("/override", function (request, response) {
+  var id = request.session.lastid;
+  //console.log("id: " + id);
+  try {
+    async function go() {
+      const db = new Database();
+      var members = await db.getUsersinTourn(id);
+
+      //var members = await db.getUsersinTourn(id);
+      response.render("override.ejs", {
+        members: members,
+        error: null,
+      });
+    }
+    go();
+  } catch (e) {
+    response.status(404).render("/errorpage.ejs");
+
+    console.log("something went wrong");
+  } finally {
+    //response.end();
+    // response.render("home.ejs", {
+    // status: "You have started your tournament!",
+    //});
   }
 });
 
@@ -485,11 +513,12 @@ app.post("/start", function (request, response) {
   var id = request.session.lastid;
   console.log("id: " + id);
   try {
+    go();
     async function go() {
       const db = new Database();
       var members = await db.getUsersinTourn(id);
 
-     // var members = await db.getUsersinTourn(id);
+      // var members = await db.getUsersinTourn(id);
 
       // await db.addToListToPlay("New Tourn","user5","user4")
       // l = members.length
@@ -508,14 +537,14 @@ app.post("/start", function (request, response) {
           //populate db with list of players
           if (d + i >= members.length - 1) {
             await db.addToListToPlay(
-              "New Tourn",
+              id,
               members[d].username,
               members[count].username
             );
             count++;
           } else {
             await db.addToListToPlay(
-              "New Tourn",
+              id,
               members[d].username,
               members[d + i + 1].username
             );
@@ -526,20 +555,19 @@ app.post("/start", function (request, response) {
           if (i == 0) {
             if (d + i >= members.length - 1) {
               await db.updatePlayNext(
-                "New Tourn",
+                id,
                 members[d].username,
                 members[count - 1].username
               );
             } else
               await db.updatePlayNext(
-                "New Tourn",
+                id,
                 members[d].username,
                 members[d + i + 1].username
               );
           }
         }
       }
-      go();
     }
   } catch (e) {
     response.status(404).render("/errorpage.ejs");
@@ -554,27 +582,166 @@ app.post("/start", function (request, response) {
 });
 
 app.post("/override", function (request, response) {
-    var id = request.session.lastid;
-  console.log("id: " + id);
+  var wins = request.body.wins;
+  var losses = request.body.losses;
+  var userto = request.body.userto;
+
+  //console.log(wins + losses + userto)
+  var id = request.session.lastid;
+  // console.log("id: " + id);
   try {
     async function go() {
       const db = new Database();
-      var members = await db.getUsersinTourn(id);
+
+      await db.updateWinInTourn(id, userto, wins);
+      await db.updateLossInTourn(id, userto, losses);
 
       //var members = await db.getUsersinTourn(id);
+
+      // var members = await db.getUsersinTourn(id);
+
+      // await db.addToListToPlay("New Tourn","user5","user4")
+      // l = members.length
+      //console.log(Math.floor(l/2))
+      //  var count = 1;
     }
-    } catch (e) {
-        response.status(404).render("/errorpage.ejs");
-    
-        console.log("something went wrong");
-      } finally {
-        //response.end();
-        response.render("home.ejs", {
-          status: "You have started your tournament!",
-        });
-      }
-      go();
+    go();
+  } catch (e) {
+    response.status(404).render("/errorpage.ejs");
+
+    console.log("something went wrong");
+  } finally {
+    //response.end();
+    response.render("home.ejs", {
+      status: "You have updated " + userto + " in your tournament!",
+    });
+  }
 });
+
+app.post("/selfreport", function (request, response) {
+  var wins = parseInt(request.body.wins);
+  var losses = parseInt(request.body.losses);
+
+  //var userto = request.body.userto;
+  var user = request.session.username;
+  //console.log(wins + losses + userto)
+  var id = request.session.lastid;
+  // console.log("id: " + id);
+  var statusreport = "default";
+  try {
+    async function go() {
+      const db = new Database();
+
+      var use = await db.getUSerDataFromTorun(id, user);
+      if (use[1].playnext != "User Finished") {
+        // console.log(user + " " + id)
+        //  console.log(use[1].wins + " " + use[1].losses);
+        //update user 1
+        await db.updateWinInTourn(id, user, wins + use[1].wins);
+        await db.updateLossInTourn(id, user, losses + use[1].losses);
+
+        var otheruser = await db.getUSerDataFromTorun(id, use[1].playnext);
+        //update user2
+        await db.updateWinInTourn(
+          id,
+          otheruser[1].user,
+          losses + otheruser[1].wins
+        );
+        await db.updateLossInTourn(
+          id,
+          otheruser[1].user,
+          wins + otheruser[1].losses
+        );
+
+        /////////////////
+        //
+        //////////////////
+        var update;
+        var update2;
+        //advance the user playnext list and drop one
+        //find what to update via their list of play next
+        for (i = 0; i <= use[1].listtoplay.length - 1; i++) {
+          if (i == use[1].listtoplay.length - 1) {
+            update = "User Finished";
+          } else {
+            if (use[1].listtoplay[i] == use[1].playnext) {
+              update = use[1].listtoplay[i + 1];
+              break;
+            }
+          }
+        }
+
+        for (i = 0; i <= otheruser[1].listtoplay.length - 1; i++) {
+          if (i == otheruser[1].listtoplay.length - 1) {
+            update2 = "User Finished";
+          } else {
+            if (otheruser[1].listtoplay[i] == otheruser[1].playnext) {
+              update2 = otheruser[1].listtoplay[i + 1];
+              break;
+            }
+          }
+        }
+
+        // console.log(update);
+        // console.log(update2);
+
+        await db.updatePlayNext(id, user, update);
+        await db.updatePlayNext(id, otheruser[1].user, update2);
+        //var members = await db.getUsersinTourn(id);
+
+        // var members = await db.getUsersinTourn(id);
+
+        // await db.addToListToPlay("New Tourn","user5","user4")
+        // l = members.length
+        //console.log(Math.floor(l/2))
+        //  var count = 1;
+        //statusreport = 
+      } 
+      else {
+       // statusreport = "You can not report any more games";
+      }
+    }
+    go();
+  } catch (e) {
+    response.status(404).render("/errorpage.ejs");
+
+    console.log("something went wrong");
+  } finally {
+    //response.end();
+    //  console.log(statusreport)
+    response.render("home.ejs", {
+      status: statusreport,
+    });
+  }
+});
+app.post("/endTourn", function (request, response) {
+    var id = request.session.lastid;
+    //console.log("id: " + id);
+    try {
+      go();
+      async function go() {
+        const db = new Database();
+        var members = await db.getUsersinTourn(id);
+
+        for (var d = 1; d < members.length; d++) {
+            db.updateRecord(members[d].username,members[d].loss,members[d].wins);
+        
+        }
+
+        }
+      
+    } catch (e) {
+      response.status(404).render("/errorpage.ejs");
+  
+      console.log("something went wrong");
+    } finally {
+      //response.end();
+      response.render("home.ejs", {
+        status: "You have ended",
+      });
+    }
+  });
+
 
 //wep bage setup stuff
 //not https

@@ -39,6 +39,8 @@
     h2 {
         color: #4287f5;
     }
+    
+    .buttonHolder{ text-align: center; }
 </style>
 </head>
 
@@ -49,12 +51,24 @@
     <%- include('./partials/accountside.ejs'); %>
 
 
+   
 
-        <body class="container">
+     
 
             <header>
                 <%- include('./partials/header.ejs'); %>
             </header>
+            <body class="container">
+                <div class="buttonHolder">
+            <form action="selfreport" method="post">
+                <label for="wins">Wins:</label>
+                <input type="wins" name="wins" placeholder="wins" required>
+                <label for="losses">Losses:</label>
+                <input type="loesses" name="losses" placeholder="Losses" required>        
+                <input type="submit" value="Self Report Game">
+            </form>
+                </div>
+            
             <span style="color: #ff0000"><%= error %></span>
             <main>
                 <table class="center" >
