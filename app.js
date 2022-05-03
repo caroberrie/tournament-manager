@@ -46,7 +46,7 @@ app.get("/home", function (request, response) {
   }
 });
 
-app.get("/account", function (request, response) {
+app.get("/account/info", function (request, response) {
   if (request.session.loggedin) {
     const db = new Database();
     async function account() {
@@ -112,7 +112,7 @@ app.get("/allTournaments", function (request, response) {
               format: tournaments[i].format,
               style: tournaments[i].style,
               location: tournaments[i].location,
-              start: tournaments[i].start,
+              start: tournaments[i].time,
             });
           }
         }
