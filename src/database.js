@@ -71,7 +71,7 @@ class Database {
       let collection = db.collection("users");
 
       let query = {
-        username: username,
+        username: username.toLowerCase(),
       };
 
       let res = await collection.findOne(query);

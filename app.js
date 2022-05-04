@@ -60,7 +60,7 @@ app.get("/account/info", function (request, response) {
           ongoingTournament: obj[1].ongoingTournament,
         });
       } catch (e) {
-        response.render(errorpage);
+        response.render("errorpage.ejs");
       }
     }
     account();
@@ -106,13 +106,14 @@ app.get("/allTournaments", function (request, response) {
           // let tourndate = tournaments[i].date;
           // console.log(mtournaments[i]);//.isAfter(moment()));
           if (moment(tournaments[i].date).isAfter(moment())) {
+              var start = tournaments[i].date + " " + tournaments[i].time; 
             validtourns.push({
               name: tournaments[i].name,
               type: tournaments[i].type,
               format: tournaments[i].format,
               style: tournaments[i].style,
               location: tournaments[i].location,
-              start: tournaments[i].time,
+              start: start,
             });
           }
         }
@@ -276,6 +277,7 @@ app.get("/yourTourn", function (request, response) {
 app.get("/override", function (request, response) {
   var id = request.session.lastid;
   //console.log("id: " + id);
+  
   try {
     async function go() {
       const db = new Database();
@@ -463,7 +465,7 @@ app.post("/distance", function (request, response) {
               format: tournaments[i].format,
               style: tournaments[i].style,
               location: tournaments[i].location,
-              start: tournaments[i].start,
+              start: tournaments[i].time,
             });
           }
           //console.log(tournaments[5])
@@ -582,20 +584,21 @@ app.post("/start", function (request, response) {
 });
 
 app.post("/override", function (request, response) {
-  var wins = request.body.wins;
-  var losses = request.body.losses;
+  var wins = parseInt(request.body.wins);
+  var losses = parseInt(request.body.losses);
   var userto = request.body.userto;
-
+    var statusreport = "You did not enter valid integers in force override";
   //console.log(wins + losses + userto)
   var id = request.session.lastid;
   // console.log("id: " + id);
+  if(Number.isInteger(wins) & Number.isInteger(losses)){
   try {
     async function go() {
       const db = new Database();
 
       await db.updateWinInTourn(id, userto, wins);
       await db.updateLossInTourn(id, userto, losses);
-
+      statusreport = "You have updated " + userto + " in your tournament!";
       //var members = await db.getUsersinTourn(id);
 
       // var members = await db.getUsersinTourn(id);
@@ -604,6 +607,9 @@ app.post("/override", function (request, response) {
       // l = members.length
       //console.log(Math.floor(l/2))
       //  var count = 1;
+      response.render("home.ejs", {
+        status: statusreport,
+      });
     }
     go();
   } catch (e) {
@@ -612,9 +618,11 @@ app.post("/override", function (request, response) {
     console.log("something went wrong");
   } finally {
     //response.end();
+    
+  }}else{
     response.render("home.ejs", {
-      status: "You have updated " + userto + " in your tournament!",
-    });
+        status: statusreport,
+      });
   }
 });
 
@@ -627,22 +635,25 @@ app.post("/selfreport", function (request, response) {
   //console.log(wins + losses + userto)
   var id = request.session.lastid;
   // console.log("id: " + id);
-  var statusreport = "default";
+  var statusreport = "You did not enter a valid number for your self report or you are finished with your games";
   try {
+      
     async function go() {
+        if(Number.isInteger(wins) & Number.isInteger(losses)){
       const db = new Database();
-
+     
       var use = await db.getUSerDataFromTorun(id, user);
       if (use[1].playnext != "User Finished") {
+        
         // console.log(user + " " + id)
         //  console.log(use[1].wins + " " + use[1].losses);
         //update user 1
         await db.updateWinInTourn(id, user, wins + use[1].wins);
         await db.updateLossInTourn(id, user, losses + use[1].losses);
 
-        var otheruser = await db.getUSerDataFromTorun(id, use[1].playnext);
+      //  var otheruser = await db.getUSerDataFromTorun(id, use[1].playnext);
         //update user2
-        await db.updateWinInTourn(
+      /*  await db.updateWinInTourn(
           id,
           otheruser[1].user,
           losses + otheruser[1].wins
@@ -651,13 +662,15 @@ app.post("/selfreport", function (request, response) {
           id,
           otheruser[1].user,
           wins + otheruser[1].losses
-        );
+        );*/
 
         /////////////////
         //
         //////////////////
         var update;
-        var update2;
+        statusreport = "Thank you for self reporting!";
+        console.log(statusreport);
+        //var update2;
         //advance the user playnext list and drop one
         //find what to update via their list of play next
         for (i = 0; i <= use[1].listtoplay.length - 1; i++) {
@@ -671,7 +684,7 @@ app.post("/selfreport", function (request, response) {
           }
         }
 
-        for (i = 0; i <= otheruser[1].listtoplay.length - 1; i++) {
+  /*      for (i = 0; i <= otheruser[1].listtoplay.length - 1; i++) {
           if (i == otheruser[1].listtoplay.length - 1) {
             update2 = "User Finished";
           } else {
@@ -680,13 +693,13 @@ app.post("/selfreport", function (request, response) {
               break;
             }
           }
-        }
+        }*/
 
         // console.log(update);
         // console.log(update2);
 
         await db.updatePlayNext(id, user, update);
-        await db.updatePlayNext(id, otheruser[1].user, update2);
+     //   await db.updatePlayNext(id, otheruser[1].user, update2);
         //var members = await db.getUsersinTourn(id);
 
         // var members = await db.getUsersinTourn(id);
@@ -696,11 +709,14 @@ app.post("/selfreport", function (request, response) {
         //console.log(Math.floor(l/2))
         //  var count = 1;
         //statusreport = 
+        response.render("home.ejs", {
+            status: statusreport,
+          });
       } 
       else {
        // statusreport = "You can not report any more games";
       }
-    }
+    }}
     go();
   } catch (e) {
     response.status(404).render("/errorpage.ejs");
@@ -709,9 +725,7 @@ app.post("/selfreport", function (request, response) {
   } finally {
     //response.end();
     //  console.log(statusreport)
-    response.render("home.ejs", {
-      status: statusreport,
-    });
+    
   }
 });
 app.post("/endTourn", function (request, response) {
