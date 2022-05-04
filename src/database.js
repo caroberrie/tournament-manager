@@ -163,7 +163,7 @@ class Database {
       };
 
       let res = await collection.countDocuments(query);
-
+      return res;
       console.log("user checked");
     } catch (err) {
       console.log(err);
